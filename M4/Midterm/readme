@@ -1,0 +1,11 @@
+This program shows:
+- Hash text with **SHA-256**
+- Encrypt and decrypt text using **AES-GCM**
+- Check that the decrypted text matches the original by comparing hashes
+
+1. You type in some text.
+2. The program makes a SHA-256 hash of it.
+3. It encrypts the text using AES-GCM (random key + random IV).
+4. It decrypts the text back to normal.
+5. It hashes the decrypted text again.
+6. If both hashes match, it prints “Hashed verified.”
