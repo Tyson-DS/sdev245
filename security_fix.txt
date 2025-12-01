@@ -1,0 +1,89 @@
+1. app.get('/profile/:userId', (req, res) => {
+    User.findById(req.user.Id, (err, user) => {
+        if (err) return res.status(500).send(err);
+        res.json(user);
+    });
+});
+
+Should use the users id to make sure they are only accessing their own profile instead of getting the params from the url bc they could change those.
+
+2. @app.route('/account')
+def get_account():
+    user_id = current_user.id
+    user = db.query(User).filter_by(id=user_id).first()
+    return jsonify(user.to_dict())
+Should use the users id to make sure they are only accessing their own profile instead of getting the params from the url bc they could change those.
+
+3. public String hashPassword(String password) throws NoSuchAlgorithmException {
+    MessageDigest md = MessageDigest.getInstance("SHA-256");
+    md.update(password.getBytes());
+    byte[] digest = md.digest();
+    return DatatypeConverter.printHexBinary(digest);
+
+MD5 is not considered secure any more so i changed it to sha-256
+
+4. import os
+import hashlib
+import binascii
+
+def hash_password(password: str, iterations: int = 100_000) -> str:
+    salt = os.urandom(16)
+    dk = hashlib.pbkdf2_hmac('sha256', password.encode(), salt, iterations)
+    return f"{iterations}:{binascii.hexlify(salt).decode()}:{binascii.hexlify(dk).decode()}"
+
+changed from sha-1 which isn't secure to sha-256
+
+5. String username = request.getParameter("username");
+String sql = "SELECT * FROM users WHERE username = ?";
+PreparedStatement pstmt = connection.PreparedStatement(sql);
+pstmt.setString(1, username);
+ResultSet rs = pstmt.executeQuery();
+
+An attacker could inject ' and change the query’s meaning so changed it to a PreparedStatement with placeholders so user data is sent as a parameter and not as SQL code.
+
+6. app.get('/user', (req, res) => {
+    const username = String(req.query.username);  // force it to be a string
+
+    db.collection('users').findOne({ username: username }, (err, user) => {
+        if (err) throw err;
+        res.json(user);
+    });
+});
+
+7. @app.route('/reset-password', methods=['POST'])
+def reset_password():
+    token = request.form['token']        # must use a reset token
+    new_password = request.form['new_password']
+
+    user = verify_reset_token(token)     # only valid tokens allowed
+    user.password = hash(new_password)   # never store plain passwords
+    db.session.commit()
+    return "Password reset"
+
+now require a reset token, so random users can’t change someone else’s password.
+
+8. <script src="https://cdn.example.com/lib.js"
+        integrity="HASH_VALUE"
+        crossorigin="anonymous"></script>
+
+The integrity attribute makes sure the file hasn’t been changed.
+
+9. allowed = ["https://example.com"]
+
+url = input("Enter URL: ")
+if url not in allowed:
+    raise ValueError("URL not allowed")
+
+response = requests.get(url)
+print(response.text)
+
+The server now only connects to safe, approved URLs not attacker-controlled ones.
+
+10. if (BCrypt.checkpw(inputPassword, user.getPasswordHash())) {
+    // login success
+}
+
+Uses hashed passwords, not real ones so the attackers can’t get the original password even if the database leaks.
+
+
+
